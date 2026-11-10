@@ -5,18 +5,28 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_DIR="$(dirname "$SCRIPT_DIR")"
 PROJECT_DIR="$WORKSPACE_DIR/juice-shop"
 
-if [ ! -d "$PROJECT_DIR" ]; then
-    echo "ERREUR : Juice Shop n'est pas installé."
-    exit 1
+ARCHIVE_URL="https://github.com/juice-shop/juice-shop/releases/download/v20.4.0/juice-shop-20.4.0_node22_linux_x64.tgz"
+
+echo "Installation de OWASP Juice Shop 20.4.0..."
+
+if [ ! -f "$PROJECT_DIR/package.json" ]; then
+    TMP_DIR="$(mktemp -d)"
+    trap 'rm -rf "$TMP_DIR"' EXIT
+
+    echo "Téléchargement de la distribution officielle..."
+    curl -fL "$ARCHIVE_URL" -o "$TMP_DIR/juice-shop.tgz"
+
+    echo "Extraction..."
+    tar -xzf "$TMP_DIR/juice-shop.tgz" -C "$TMP_DIR"
+
+    mkdir -p "$PROJECT_DIR"
+    cp -a "$TMP_DIR/juice-shop_20.4.0-SNAPSHOT/." "$PROJECT_DIR/"
 fi
 
-cd "$PROJECT_DIR"
+echo "Vérification..."
+node --version
+npm --version
+test -f "$PROJECT_DIR/build/app.js"
+test -f "$PROJECT_DIR/node_modules/express/package.json"
 
-if pgrep -f "node.*build/app" >/dev/null; then
-    echo "Juice Shop semble déjà démarré."
-    exit 0
-fi
-
-echo "Démarrage de OWASP Juice Shop..."
-nohup npm start > "$WORKSPACE_DIR/juice-shop.log" 2>&1 < /dev/null &
-echo "Juice Shop lancé en arrière-plan."
+echo "Installation terminée."
