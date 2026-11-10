@@ -1,0 +1,17 @@
+{
+  "name": "TP Audit Web - Juice Shop",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "hostRequirements": {
+    "cpus": 2
+  },
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "OWASP Juice Shop",
+      "visibility": "private",
+      "onAutoForward": "notify"
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start-juice-shop.sh"
+}
