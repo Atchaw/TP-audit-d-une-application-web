@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "========================================"
-echo " Installation de OWASP Juice Shop 20.4.0"
-echo "========================================"
-
 PROJECT_DIR="/workspaces/$(basename "$PWD")/juice-shop"
+ARCHIVE_URL="https://github.com/juice-shop/juice-shop/releases/download/v20.4.0/juice-shop-20.4.0_node22_linux_x64.tgz"
 
-if [ -d "$PROJECT_DIR" ]; then
-    echo "Le dossier Juice Shop existe déjà."
-else
-    echo "Téléchargement de Juice Shop..."
-    git clone --depth 1 --branch v20.4.0 \
-        https://github.com/juice-shop/juice-shop.git \
-        "$PROJECT_DIR"
-fi
+echo "Installation de OWASP Juice Shop 20.4.0..."
 
+mkdir -p "$PROJECT_DIR"
 cd "$PROJECT_DIR"
 
-echo "Installation des dépendances Node.js..."
-CYPRESS_INSTALL_BINARY=0 npm install
+if [ ! -f package.json ]; then
+    echo "Téléchargement de la distribution officielle..."
+    curl -fL "$ARCHIVE_URL" -o /tmp/juice-shop.tgz
 
-echo "========================================"
-echo " Installation terminée avec succès."
-echo "========================================"
+    echo "Extraction..."
+    tar -xzf /tmp/juice-shop.tgz -C "$PROJECT_DIR"
+
+    rm /tmp/juice-shop.tgz
+fi
+
+echo "Vérification de l'installation..."
+node --version
+npm --version
+
+echo "Installation terminée."
