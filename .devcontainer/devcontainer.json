@@ -12,6 +12,5 @@
       "onAutoForward": "notify"
     }
   },
-  "postCreateCommand": "bash .devcontainer/setup.sh",
-  "postStartCommand": "bash .devcontainer/start-juice-shop.sh"
+  "postCreateCommand": "bash .devcontainer/setup.sh"
 }

@@ -19,6 +19,27 @@ if curl -fsS http://127.0.0.1:3000/ >/dev/null 2>&1; then
 fi
 
 echo "Démarrage de OWASP Juice Shop..."
-nohup npm start > "$LOG_FILE" 2>&1 < /dev/null &
 
-echo "Juice Shop lancé en arrière-plan."
+nohup npm start > "$LOG_FILE" 2>&1 < /dev/null &
+SERVER_PID=$!
+
+echo "Attente du démarrage de Juice Shop..."
+
+for attempt in {1..30}; do
+    if curl -fsS http://127.0.0.1:3000/ >/dev/null 2>&1; then
+        echo "Juice Shop est accessible sur le port 3000."
+        exit 0
+    fi
+
+    if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+        echo "ERREUR : le processus Juice Shop s'est arrêté."
+        cat "$LOG_FILE"
+        exit 1
+    fi
+
+    sleep 1
+done
+
+echo "ERREUR : Juice Shop ne répond pas après 30 secondes."
+cat "$LOG_FILE"
+exit 1
